@@ -238,4 +238,17 @@ public class AppointmentsController : ControllerBase
             });
         }
     }
+
+
+
+    [HttpGet("admin")]
+    [Authorize(Roles = "Administrator")]
+    public async Task<ActionResult<List<AppointmentResponse>>>
+    GetAllForAdmin()
+    {
+        List<AppointmentResponse> appointments =
+            await _appointmentService.GetAllForAdminAsync();
+
+        return Ok(appointments);
+    }
 }
