@@ -86,6 +86,7 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<InsuranceClaimService>();
 builder.Services.AddScoped<InsurancePolicyService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<ReceptionistService>();
 
 
 // =========================================================
