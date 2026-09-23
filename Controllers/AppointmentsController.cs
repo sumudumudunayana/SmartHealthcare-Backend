@@ -106,6 +106,40 @@ public class AppointmentsController : ControllerBase
     }
 
 
+    [HttpGet("doctor/{doctorId:guid}/date/{date}")]
+    [Authorize(Roles = "Patient")]
+    public async Task<ActionResult<List<AppointmentResponse>>>
+    GetDoctorAppointmentsByDate(
+        Guid doctorId,
+        DateOnly date)
+    {
+        try
+        {
+            List<AppointmentResponse> appointments =
+                await _appointmentService
+                    .GetDoctorAppointmentsByDateAsync(
+                        doctorId,
+                        date);
+
+            return Ok(appointments);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new
+            {
+                message = ex.Message
+            });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new
+            {
+                message = ex.Message
+            });
+        }
+    }
+
+
 
 
     [HttpGet("{appointmentId:guid}")]
