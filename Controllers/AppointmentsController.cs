@@ -285,4 +285,20 @@ public class AppointmentsController : ControllerBase
 
         return Ok(appointments);
     }
+
+
+    // ============================================================
+    // GET ALL APPOINTMENTS FOR RECEPTIONIST
+    // ============================================================
+    [HttpGet("receptionist")]
+    [Authorize(Roles = "Receptionist")]
+    public async Task<ActionResult<List<AppointmentResponse>>>
+        GetAllForReceptionist()
+    {
+        List<AppointmentResponse> appointments =
+            await _appointmentService
+                .GetAllForReceptionistAsync();
+
+        return Ok(appointments);
+    }
 }
