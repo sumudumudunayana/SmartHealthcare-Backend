@@ -241,4 +241,34 @@ public class BillService
             })
             .ToListAsync();
     }
+
+
+
+    public async Task<List<BillResponse>> GetAllForReceptionistAsync()
+    {
+        return await _context.Bills
+            .AsNoTracking()
+            .Include(b => b.Patient)
+                .ThenInclude(p => p!.User)
+            .Include(b => b.Appointment)
+                .ThenInclude(a => a!.Doctor)
+                    .ThenInclude(d => d!.User)
+            .OrderByDescending(b => b.GeneratedDate)
+            .Select(b => new BillResponse
+            {
+                BillId = b.BillId,
+                AppointmentId = b.AppointmentId,
+
+                PatientId = b.PatientId,
+                PatientName = b.Patient!.User!.FullName,
+
+                DoctorId = b.Appointment!.DoctorId,
+                DoctorName = b.Appointment.Doctor!.User!.FullName,
+
+                TotalAmount = b.TotalAmount,
+                BillStatus = b.BillStatus,
+                GeneratedDate = b.GeneratedDate
+            })
+            .ToListAsync();
+    }
 }
