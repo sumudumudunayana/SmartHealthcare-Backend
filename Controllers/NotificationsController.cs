@@ -124,4 +124,17 @@ public class NotificationsController : ControllerBase
 
         return userId;
     }
+
+
+    // GET: api/Notifications/users
+    // Administrator or Receptionist gets users who can receive notifications
+    [HttpGet("users")]
+    [Authorize(Roles = "Administrator,Receptionist")]
+    public async Task<ActionResult<List<object>>> GetUsers()
+    {
+        List<object> users =
+            await _notificationService.GetNotificationUsersAsync();
+
+        return Ok(users);
+    }
 }
