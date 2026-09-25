@@ -627,4 +627,49 @@ public class AppointmentService
             })
             .ToListAsync();
     }
+
+
+
+
+    public async Task<List<AppointmentResponse>>
+    GetAllForReceptionistAsync()
+    {
+        return await _context.Appointments
+            .AsNoTracking()
+            .Include(a => a.Patient)
+                .ThenInclude(p => p!.User)
+            .Include(a => a.Doctor)
+                .ThenInclude(d => d!.User)
+            .OrderBy(a => a.AppointmentDate)
+            .ThenBy(a => a.AppointmentTime)
+            .Select(a => new AppointmentResponse
+            {
+                AppointmentId = a.AppointmentId,
+
+                PatientId = a.PatientId,
+
+                PatientName =
+                    a.Patient!.User!.FullName,
+
+                DoctorId = a.DoctorId,
+
+                DoctorName =
+                    a.Doctor!.User!.FullName,
+
+                ScheduleId = a.ScheduleId,
+
+                AppointmentDate =
+                    a.AppointmentDate,
+
+                AppointmentTime =
+                    a.AppointmentTime,
+
+                Status = a.Status,
+
+                Symptoms = a.Symptoms,
+
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+    }
 }
