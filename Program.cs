@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SmartHealthcare.API.Services;
 using Microsoft.OpenApi;
+using SmartHealthcare.API.AI.LLM;
+using SmartHealthcare.API.AI.Orchestration;
+using SmartHealthcare.API.AI.Agents;
+using SmartHealthcare.API.AI.Tools;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,6 +91,19 @@ builder.Services.AddScoped<InsuranceClaimService>();
 builder.Services.AddScoped<InsurancePolicyService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReceptionistService>();
+
+builder.Services.AddScoped<ILLMService, LLMService>();
+builder.Services.AddScoped<IAIOrchestrator, AIOrchestrator>();
+builder.Services.AddScoped<IHealthcareAgent, AppointmentSchedulingAgent>();
+builder.Services.AddScoped<IAppointmentSchedulingTool, AppointmentSchedulingTool>();
+builder.Services.AddScoped<IAIWorkflowService, AIWorkflowService>();
+builder.Services.AddScoped<IAIApprovalService, AIApprovalService>();
+builder.Services.AddScoped<IHealthcareAgent,PatientTriageAgent>();
+builder.Services.AddScoped<IHealthcareAgent, MedicalSummaryAgent>();
+builder.Services.AddScoped<IMedicalSummaryTool, MedicalSummaryTool>();
+builder.Services.AddScoped<IHealthcareAgent, BillingValidationAgent>();
+builder.Services.AddScoped<IBillingValidationTool, BillingValidationTool>();
+builder.Services.AddScoped<IAIRecommendationService,AIRecommendationService>();
 
 
 // =========================================================
