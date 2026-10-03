@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartHealthcare.API.Data;
@@ -11,9 +12,11 @@ using SmartHealthcare.API.Data;
 namespace SmartHealthcare.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261002075012_ChangeAIRecommendationDataToText")]
+    partial class ChangeAIRecommendationDataToText
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,11 +234,6 @@ namespace SmartHealthcare.API.Migrations
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BillNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("BillStatus")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -254,9 +252,6 @@ namespace SmartHealthcare.API.Migrations
                     b.HasKey("BillId");
 
                     b.HasIndex("AppointmentId")
-                        .IsUnique();
-
-                    b.HasIndex("BillNumber")
                         .IsUnique();
 
                     b.HasIndex("PatientId");

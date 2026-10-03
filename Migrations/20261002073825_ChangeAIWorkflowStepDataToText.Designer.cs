@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SmartHealthcare.API.Data;
@@ -11,9 +12,11 @@ using SmartHealthcare.API.Data;
 namespace SmartHealthcare.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261002073825_ChangeAIWorkflowStepDataToText")]
+    partial class ChangeAIWorkflowStepDataToText
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,11 +71,13 @@ namespace SmartHealthcare.API.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Reasoning")
-                        .HasColumnType("text");
+                        .HasMaxLength(10000)
+                        .HasColumnType("character varying(10000)");
 
                     b.Property<string>("Recommendation")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
 
                     b.Property<string>("RecommendationType")
                         .IsRequired()
@@ -231,11 +236,6 @@ namespace SmartHealthcare.API.Migrations
                     b.Property<Guid>("AppointmentId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BillNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("BillStatus")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -254,9 +254,6 @@ namespace SmartHealthcare.API.Migrations
                     b.HasKey("BillId");
 
                     b.HasIndex("AppointmentId")
-                        .IsUnique();
-
-                    b.HasIndex("BillNumber")
                         .IsUnique();
 
                     b.HasIndex("PatientId");
