@@ -566,50 +566,53 @@ public class ApplicationDbContext : DbContext
         });
 
 
-        // ============================================================
-        // BILL
-        // ============================================================
-
         modelBuilder.Entity<Bill>(entity =>
-        {
-            entity.HasKey(b => b.BillId);
+{
+    entity.HasKey(b => b.BillId);
 
-            entity.Property(b => b.TotalAmount)
-                .HasPrecision(12, 2);
+    entity.Property(b => b.BillNumber)
+        .IsRequired()
+        .HasMaxLength(20);
 
-            entity.Property(b => b.BillStatus)
-                .IsRequired()
-                .HasMaxLength(30);
+    entity.HasIndex(b => b.BillNumber)
+        .IsUnique();
 
+    entity.Property(b => b.TotalAmount)
+        .HasPrecision(12, 2);
 
-            // Appointment -> Bill (1:1)
-            entity.HasOne(b => b.Appointment)
-                .WithOne()
-                .HasForeignKey<Bill>(b => b.AppointmentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-
-            // One appointment = one bill
-            entity.HasIndex(b => b.AppointmentId)
-                .IsUnique();
+    entity.Property(b => b.BillStatus)
+        .IsRequired()
+        .HasMaxLength(30);
 
 
-            // Patient -> Bills
-            entity.HasOne(b => b.Patient)
-                .WithMany(p => p.Bills)
-                .HasForeignKey(b => b.PatientId)
-                .OnDelete(DeleteBehavior.Restrict);
+    // Appointment -> Bill (1:1)
+    entity.HasOne(b => b.Appointment)
+        .WithOne()
+        .HasForeignKey<Bill>(b => b.AppointmentId)
+        .OnDelete(DeleteBehavior.Restrict);
 
 
-            // Bill amount cannot be negative
-            entity.ToTable(t =>
-            {
-                t.HasCheckConstraint(
-                    "CK_Bills_TotalAmount",
-                    "\"TotalAmount\" >= 0"
-                );
-            });
-        });
+    // One appointment = one bill
+    entity.HasIndex(b => b.AppointmentId)
+        .IsUnique();
+
+
+    // Patient -> Bills
+    entity.HasOne(b => b.Patient)
+        .WithMany(p => p.Bills)
+        .HasForeignKey(b => b.PatientId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+
+    // Bill amount cannot be negative
+    entity.ToTable(t =>
+    {
+        t.HasCheckConstraint(
+            "CK_Bills_TotalAmount",
+            "\"TotalAmount\" >= 0"
+        );
+    });
+});
 
 
         // ============================================================
@@ -870,10 +873,10 @@ public class ApplicationDbContext : DbContext
                 .HasMaxLength(50);
 
             entity.Property(s => s.InputData)
-                .HasMaxLength(10000);
+                 .HasColumnType("text");
 
             entity.Property(s => s.OutputData)
-                .HasMaxLength(10000);
+                .HasColumnType("text");
 
             entity.Property(s => s.StepOrder)
                 .IsRequired();
@@ -906,10 +909,10 @@ public class ApplicationDbContext : DbContext
 
             entity.Property(r => r.Recommendation)
                 .IsRequired()
-                .HasMaxLength(5000);
+                .HasColumnType("text");
 
             entity.Property(r => r.Reasoning)
-                .HasMaxLength(10000);
+                .HasColumnType("text");
 
             entity.Property(r => r.Status)
                 .IsRequired()
