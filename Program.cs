@@ -98,12 +98,12 @@ builder.Services.AddScoped<IHealthcareAgent, AppointmentSchedulingAgent>();
 builder.Services.AddScoped<IAppointmentSchedulingTool, AppointmentSchedulingTool>();
 builder.Services.AddScoped<IAIWorkflowService, AIWorkflowService>();
 builder.Services.AddScoped<IAIApprovalService, AIApprovalService>();
-builder.Services.AddScoped<IHealthcareAgent,PatientTriageAgent>();
+builder.Services.AddScoped<IHealthcareAgent, PatientTriageAgent>();
 builder.Services.AddScoped<IHealthcareAgent, MedicalSummaryAgent>();
 builder.Services.AddScoped<IMedicalSummaryTool, MedicalSummaryTool>();
 builder.Services.AddScoped<IHealthcareAgent, BillingValidationAgent>();
 builder.Services.AddScoped<IBillingValidationTool, BillingValidationTool>();
-builder.Services.AddScoped<IAIRecommendationService,AIRecommendationService>();
+builder.Services.AddScoped<IAIRecommendationService, AIRecommendationService>();
 
 
 // =========================================================
