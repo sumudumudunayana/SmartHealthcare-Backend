@@ -138,13 +138,15 @@ builder.Services.AddScoped<IAIRecommendationService, AIRecommendationService>();
 // CORS Configuration
 // =========================================================
 
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("SmartHealthcareFrontend", policy =>
     {
         policy
             .WithOrigins(
-                "http://localhost:5173"
+                "http://localhost:5173",
+                "https://smart-healthcare-frontend-brown.vercel.app"
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
