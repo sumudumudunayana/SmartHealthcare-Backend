@@ -9,14 +9,28 @@ using SmartHealthcare.API.AI.LLM;
 using SmartHealthcare.API.AI.Orchestration;
 using SmartHealthcare.API.AI.Agents;
 using SmartHealthcare.API.AI.Tools;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// =========================================================
+// Render Port Configuration
+// =========================================================
+
+var port = Environment.GetEnvironmentVariable("PORT");
+
+if (!string.IsNullOrWhiteSpace(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+}
+
 
 // =========================================================
 // Database Configuration
 // =========================================================
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
@@ -44,16 +58,20 @@ if (string.IsNullOrWhiteSpace(jwtKey))
     );
 }
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(
+    JwtBearerDefaults.AuthenticationScheme
+)
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters =
+        new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
 
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey)
-            ),
+            IssuerSigningKey =
+                new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(jwtKey)
+                ),
 
             ValidateIssuer = true,
             ValidIssuer = jwtIssuer,
@@ -65,7 +83,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
             ClockSkew = TimeSpan.Zero
         };
-    });
+});
 
 builder.Services.AddAuthorization();
 
@@ -92,17 +110,27 @@ builder.Services.AddScoped<InsurancePolicyService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddScoped<ReceptionistService>();
 
+
+// =========================================================
+// AI Services
+// =========================================================
+
 builder.Services.AddScoped<ILLMService, LLMService>();
 builder.Services.AddScoped<IAIOrchestrator, AIOrchestrator>();
+
 builder.Services.AddScoped<IHealthcareAgent, AppointmentSchedulingAgent>();
 builder.Services.AddScoped<IAppointmentSchedulingTool, AppointmentSchedulingTool>();
+
 builder.Services.AddScoped<IAIWorkflowService, AIWorkflowService>();
 builder.Services.AddScoped<IAIApprovalService, AIApprovalService>();
+
 builder.Services.AddScoped<IHealthcareAgent, PatientTriageAgent>();
 builder.Services.AddScoped<IHealthcareAgent, MedicalSummaryAgent>();
 builder.Services.AddScoped<IMedicalSummaryTool, MedicalSummaryTool>();
+
 builder.Services.AddScoped<IHealthcareAgent, BillingValidationAgent>();
 builder.Services.AddScoped<IBillingValidationTool, BillingValidationTool>();
+
 builder.Services.AddScoped<IAIRecommendationService, AIRecommendationService>();
 
 
@@ -115,7 +143,9 @@ builder.Services.AddCors(options =>
     options.AddPolicy("SmartHealthcareFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(
+                "http://localhost:5173"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -147,8 +177,25 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSecurityRequirement(document =>
         new OpenApiSecurityRequirement
         {
-            [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+            [
+                new OpenApiSecuritySchemeReference(
+                    "Bearer",
+                    document
+                )
+            ] = []
         });
+});
+
+
+// =========================================================
+// Forwarded Headers - Render Proxy
+// =========================================================
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor |
+        ForwardedHeaders.XForwardedProto;
 });
 
 
@@ -159,21 +206,55 @@ var app = builder.Build();
 // HTTP Request Pipeline
 // =========================================================
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseForwardedHeaders();
 
-app.UseHttpsRedirection();
 
-// IMPORTANT: CORS must be before Authentication/Authorization
+// =========================================================
+// Swagger
+// =========================================================
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+
+// =========================================================
+// HTTPS
+// =========================================================
+
+// Render handles HTTPS at the proxy level.
+// Do not redirect HTTPS inside the container.
+
+// app.UseHttpsRedirection();
+
+
+// =========================================================
+// CORS
+// =========================================================
+
+// IMPORTANT:
+// CORS must be before Authentication/Authorization.
+
 app.UseCors("SmartHealthcareFrontend");
+
+
+// =========================================================
+// Authentication & Authorization
+// =========================================================
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
+
+// =========================================================
+// Controllers
+// =========================================================
+
 app.MapControllers();
+
+
+// =========================================================
+// Run
+// =========================================================
 
 app.Run();
