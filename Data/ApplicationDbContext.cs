@@ -11,9 +11,7 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // =========================
     // DbSets
-    // =========================
 
     public DbSet<Role> Roles => Set<Role>();
 
