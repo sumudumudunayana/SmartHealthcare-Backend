@@ -18,9 +18,7 @@ public class ReceptionistService
         _passwordService = passwordService;
     }
 
-    // ============================================================
     // CREATE RECEPTIONIST
-    // ============================================================
 
     public async Task<ReceptionistResponse> CreateAsync(
         CreateReceptionistRequest request)
@@ -116,9 +114,7 @@ public class ReceptionistService
         };
     }
 
-    // ============================================================
     // GET ALL RECEPTIONISTS
-    // ============================================================
 
     public async Task<List<ReceptionistResponse>>
         GetAllAsync()
